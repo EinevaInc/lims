@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User, ClientProfile
 
 class CustomUserCreationForm(UserCreationForm):
@@ -10,6 +10,11 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ('email', 'first_name', 'last_name', 'national_id')  # Add your custom fields
 
+class LoginForm(AuthenticationForm):
+    """
+    Custom form for user login.
+    """
+    username = forms.EmailField(label='Email')
 
 class CustomUserChangeForm(UserChangeForm):
     """
@@ -18,7 +23,6 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('email', 'first_name', 'last_name', 'national_id')
-
 
 class ClientProfileForm(forms.ModelForm):
     """

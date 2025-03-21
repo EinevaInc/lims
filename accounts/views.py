@@ -16,7 +16,7 @@ class SignUpView(CreateView):
     View for user registration.
     """
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy('login')  # Redirect to login after successful signup
+    success_url = reverse_lazy('accounts:login')  # Redirect to login after successful signup
     template_name = 'accounts/signup.html'
 
     def form_valid(self, form):
@@ -79,24 +79,18 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 
 @login_required
 @transaction.atomic
-def update_profile(request):
+def update_client_profile(request):
     """
-    View to update both user and client profile in one transaction.
+    View to update client profile in one transaction.
     """
     if request.method == 'POST':
-        user_form = CustomUserChangeForm(request.POST, instance=request.user)
         profile_form = ClientProfileForm(request.POST, instance=request.user.client_profile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
+        if profile_form.is_valid():
             profile_form.save()
             messages.success(request, 'Your profile was successfully updated!')
-            return redirect('accounts:profile') # Use namespacing
+            return redirect('accounts:update_client_profile')
         else:
             messages.error(request, 'Please correct the error below.')
     else:
-        user_form = CustomUserChangeForm(instance=request.user)
         profile_form = ClientProfileForm(instance=request.user.client_profile)
-    return render(request, 'accounts/profile_edit.html', {
-        'user_form': user_form,
-        'profile_form': profile_form
-    })
+    return render(request, 'accounts/update_client_profile.html', {'profile_form': profile_form})

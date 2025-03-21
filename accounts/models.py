@@ -2,29 +2,17 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager, Permission
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-
 class CustomUserManager(BaseUserManager):
-    """
-    Custom user model manager where email is the unique identifier
-    for authentication instead of usernames.
-    """
-
-    def create_user(self, email, password, **extra_fields):
-        """
-        Create and save a User with the given email and password.
-        """
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
-        user.save()
+        user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
-        """
-        Create and save a SuperUser with the given email and password.
-        """
+    def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
@@ -35,38 +23,23 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
-
 class User(AbstractUser, PermissionsMixin):
-    """
-    Custom User model.
-    """
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=150)
     last_name = models.CharField(_('last name'), max_length=150)
-    national_id = models.CharField(max_length=20, blank=True, null=True, unique=True) # Ensure unique, but allow blank
-    # Add other general user fields here (e.g., phone_number)
+    national_id = models.CharField(max_length=20, blank=True, null=True, unique=True)
 
-    USERNAME_FIELD = 'email'  # Use email as the unique identifier
-    REQUIRED_FIELDS = ['first_name', 'last_name']  # Fields required for createsuperuser
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = CustomUserManager()
 
     def __str__(self):
         return self.email
 
-    class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
-
-
 class ClientProfile(models.Model):
-    """
-    Extends the User model with client-specific information.
-    """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client_profile')
-    # Add client-specific fields here, e.g.,
     contact_details = models.TextField(blank=True, null=True)
-    # address = ...  (Consider linking to the Address model in survey_realestate)
 
     def __str__(self):
         return f"Profile of {self.user.email}"
