@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Create Property with Address</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ property_form.as_p }}
+    {{ address_form.as_p }}
+    <button type="submit">Create</button>
+</form>
+{% endblock %}

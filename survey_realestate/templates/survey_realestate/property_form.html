@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{% if object %}Edit Property{% else %}Create Property{% endif %}</h2>
+  <form method="post" enctype="multipart/form-data">  {# enctype for file uploads #}
+    {% csrf_token %}
+    {{ form.as_p }}  {# Render the form #}
+    <button type="submit">Save</button>
+  </form>
+
+{% endblock %}

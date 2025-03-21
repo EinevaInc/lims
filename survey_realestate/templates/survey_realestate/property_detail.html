@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Property Details: {{ property.stand_number }}</h2>
+  <p>Land Use: {{ property.landuse_type }}</p>
+  <p>Status: {{ property.sales_status }}</p>
+  <p>Area: {{ property.size_area_sqm }} SqM</p>
+  <p>Created by: {{ property.created_by }}</p>
+    <p>Date created: {{property.date_created}}</p>
+    <p>Address: {{property.address}}</p>
+
+  {# Display the map using Leaflet or OpenLayers #}
+  <div id="map" style="width: 600px; height: 400px;"></div>
+
+  <a href="{% url 'survey_realestate:property_update' property.pk %}">Edit</a>
+  <a href="{% url 'survey_realestate:property_delete' property.pk %}">Delete</a>
+
+  <script>
+    // Initialize the map (using Leaflet as an example)
+    var map = L.map('map').setView([{{ property.geom.centroid.y }}, {{ property.geom.centroid.x }}], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+   var propertyGeoJSON = {{ property.geom.geojson|safe }}; //Very important, pass data to javascript
+    L.geoJSON(JSON.parse(propertyGeoJSON)).addTo(map);
+
+  </script>
+
+{% endblock %}

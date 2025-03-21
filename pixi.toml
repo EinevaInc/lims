@@ -1,0 +1,56 @@
+[project]
+name = "lims"
+version = "0.1.0"
+description = "A Land Information Management System (LIMS)"
+authors = ["consolationmangena <consolationmangena@gmail.com>"]
+channels = ["conda-forge"]
+platforms = ["linux-64"]  # Consider adding "win-64" and "osx-64" if needed
+
+[tasks]
+migrate = "python manage.py migrate"
+makemigrations = "python manage.py makemigrations"
+runserver = "python manage.py runserver 0.0.0.0:8000"  # Run on all interfaces, port 8000
+shell = "python manage.py shell"
+createsuperuser = "python manage.py createsuperuser"
+test = "python manage.py test"  # Add a test task
+lint = {cmd = "ruff . && black --check . && isort --check-only .", depends_on = ["ruff", "black", "isort"]}
+format = {cmd = "ruff --fix . && black . && isort .", depends_on = ["ruff", "black", "isort"]}
+
+
+[dependencies]
+django = ">=5.0,<5.2"   #Updated version
+gdal = ">=3.0,<4.0" #version constraint that encompasses 3.8.x.
+psycopg2-binary = ">=2.9,<3.0" # Use psycopg2-binary for easier installation
+djangorestframework = ">=3.14,<4.0"  # For REST API (if needed)
+django-cors-headers = ">=4.3,<5.0" # If you use DRF and need CORS
+django-filter = ">=23.5,<24.0" #  For advanced filtering with DRF and in general
+django-environ = ">=0.11,<1.0"  # For managing environment variables
+python-dotenv = ">=1.0,<2.0" #alternative
+pillow = ">=10.0,<11.0" # Image handling
+django-leaflet = "*"  # For Leaflet integration (easy maps)
+# Alternative: django-geojson + leaflet/openlayers directly
+# django-geojson = ">=4.0,<5.0"
+reportlab = ">=4.1,<4.2" # For generating PDFs
+django-allauth = ">=0.62,<0.63"  # For user authentication (optional, but very useful)
+django-crispy-forms = ">=2.1, <2.2" # For beautiful forms.
+crispy-bootstrap5 = ">=0.7" # Bootstrap 5 template pack for crispy-forms
+psycopg = {extras = ["binary"], version = ">=3.1,<4.0"} # Add this in addition to psycopg2-binary
+
+[build-dependencies]
+ruff = ">=0.3.0"
+black = ">=24.0"
+isort = ">=5.13"
+
+[tool.ruff]
+line-length = 88  # Match Black's default line length
+select = ["E", "F", "W", "I", "B", "C4", "SIM", "TID", "ARG", "PTH", "PL"] # reasonable defaults
+ignore = ["E501", "W191"]  # Ignore line too long (handled by Black) and tabs
+
+[tool.black]
+line-length = 88 # Standard line length
+
+[tool.isort]
+profile = "black"  # Use Black-compatible settings
+
+[tool.django-stubs]
+django_settings_module = "lims.settings"

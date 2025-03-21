@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Properties</h2>
+  <a href="{% url 'survey_realestate:property_create' %}" class="btn btn-primary">Create New Property</a>
+  <a href="{% url 'survey_realestate:create_property_with_address' %}" class="btn btn-primary">Create Property + Address</a>
+  <table>
+    <thead>
+      <tr>
+        <th>Stand Number</th>
+        <th>Land Use</th>
+        <th>Status</th>
+        <th>Area (SqM)</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for property in properties %}
+        <tr>
+          <td>{{ property.stand_number }}</td>
+          <td>{{ property.landuse_type }}</td>
+          <td>{{ property.sales_status }}</td>
+          <td>{{ property.size_area_sqm }}</td>
+          <td>
+            <a href="{% url 'survey_realestate:property_detail' property.pk %}">View</a>
+            <a href="{% url 'survey_realestate:property_update' property.pk %}">Edit</a>
+            <a href="{% url 'survey_realestate:property_delete' property.pk %}">Delete</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5">No properties found.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+    {# Add Pagination #}
+      {% if is_paginated %}
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+                <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% endblock %}
